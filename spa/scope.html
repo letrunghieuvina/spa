@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript">
+        var global_var;
+
+        first_function();
+
+        function first_function() {
+            var first_var = 50;
+            second_function();
+        }
+
+        function second_function() {
+            console.log("__" + first_var + "__");
+        }
+
+        second_function();
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

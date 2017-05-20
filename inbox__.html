@@ -1,0 +1,210 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SPA Starter</title>
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="modules/spa/shell.css">
+    <link rel="stylesheet" href="modules/pages/pages.css">
+    <link rel="stylesheet" href="modules/inbox/inbox.css">
+
+    <!-- third party javascript -->
+    <script src="js/jquery-3.1.1.min.js"></script>
+
+    <!-- our javascript -->
+    <script src="modules/spa/spa.js"></script>
+    <script src="modules/spa/util.js"></script>
+    <script src="modules/spa/shell.js"></script>
+    <script src="modules/spa/Event.js"></script>
+
+    <script src="modules/pages/PagesModel.js"></script>
+    <script src="modules/pages/PagesView.js"></script>
+    <script src="modules/pages/PagesController.js"></script>
+
+    <script src="modules/inbox/InboxChatListModel.js"></script>
+    <script src="modules/inbox/InboxChatListView.js"></script>
+    <script src="modules/inbox/InboxChatListController.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('.ib-list-threads').on('click', function(e){
+               console.log('hello');
+            });
+
+            $('#btnIbListFilterMore').on('click', function(event) {
+                var jqBtn = jQuery(this);
+                if (jqBtn.attr('value') === 'more...') {
+                    $('.ib-list-filter-time').removeClass('hidden');
+                    $('.ib-list-filter-label').removeClass('hidden');
+                    jqBtn.attr('value', 'hide...');
+                } else {
+                    $('.ib-list-filter-time').addClass('hidden');
+                    $('.ib-list-filter-label').addClass('hidden');
+                    jqBtn.attr('value', 'more...');
+                }
+            });
+
+            spa.util.center(jQuery('.ib-reply'));
+
+
+
+
+            var arr = [
+                {"idx": 1, "name": "one"},
+                {"idx": 2, "name": "two"},
+                {"idx": 3, "name": "three"},
+                {"idx": 4, "name": "four"},
+                {"idx": 5, "name": "five"},
+                {"idx": 6, "name": "six"},
+                {"idx": 7, "name": "seven"},
+                {"idx": 8, "name": "eight"},
+                {"idx": 9, "name": "nine"},
+                {"idx": 10, "name": "ten"},
+                {"idx": 11, "name": "eleven"},
+                {"idx": 12, "name": "twelve"},
+                {"idx": 13, "name": "thirteen"},
+                {"idx": 14, "name": "fourteen"},
+                {"idx": 15, "name": "fifteen"},
+                {"idx": 16, "name": "sixteen"},
+                {"idx": 17, "name": "seventeen"},
+                {"idx": 18, "name": "eighteen"},
+                {"idx": 19, "name": "nineteen"},
+            ];
+
+
+            var a = spa.util.binarySearch(arr, "idx", 1);
+            console.log("found at " + a);
+
+        });
+    </script>
+</head>
+<body>
+<div id="popup-bg" class="hidden"></div>
+<div id="spa">
+    <div class="ib">
+        <div class="ib-labels">
+            <span>Filter by labels:</span>
+            <div class="ib-labels-list">
+                <label><input type="checkbox"/>One</label>
+            </div>
+            <div class="ib-labels-new">
+                <span>New label:</span>
+                <div class="ib-labels-new-ctrl">
+                    <input type="text"/>
+                    <input type="button" value="+"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="ib-threads">
+            <div class="ib-threads-filters">
+                <div class="ib-threads-filters-filters">
+                    <div><label><input type="checkbox"/>All</label></div>
+                    <div><input type="text" placeholder="filter threads by name..."/></div>
+                    <div class="ib-threads-filters-filters-cal">
+                        <span>Filter by date from </span>
+                        <input type="date"/>
+                        <span>to </span>
+                        <input type="date"/>
+                    </div>
+                </div>
+                <div class="ib-threads-filters-actions">
+                    <div>
+                        <span>Selected:</span>
+                        <span class="ib-threads-filters-actions-selected">5</span>
+                    </div>
+                    <div>
+                        <span>Apply labels: </span>
+                        <input type="text" list="browsers">
+                        <datalist id="browsers">
+                            <option data-value="1" value="Google"/>
+                        </datalist>
+                    </div>
+                    <div>
+                        <input type="button" value="Reply Selected Threads"/>
+                    </div>
+                </div>
+            </div>
+            <div class="ib-list-threads-threads">
+                <div class="ib-list-item">
+                    <div class="ib-list-item-labels"><span>VIP</span></div>
+                    <div class="ib-list-item-content">
+                        <div class="ib-list-item-chk"><input type="checkbox"/></div>
+                        <img class="ib-list-item-avatar" src="images/a.jpg"/>
+                        <div class="ib-list-item-preview">
+                            <div class="ib-list-item-preview-name">Hieu Le</div>
+                            <div class="ib-item-preview-snippet">Xin chao ban</div>
+                        </div>
+                        <div class="ib-list-item-ta">
+                            <input type="hidden" class="chatTimeAsNumber"/>
+                            <div class="ib-list-item-ta-time">2017-02-17 18:50</div>
+                            <div class="ib-list-item-ta-action"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ib-reply">
+            <div class="ib-reply-editor">
+                <textarea>Enter your message here.</textarea>
+            </div>
+            <div class="ib-reply-preview-title">Preview</div>
+            <div class="ib-reply-preview">
+                <div class="ib-list-item">
+                    <div class="ib-list-item-labels"><span>VIP</span></div>
+                    <div class="ib-list-item-content">
+                        <div class="ib-list-item-chk"><input type="checkbox"/></div>
+                        <img class="ib-list-item-avatar" src="images/a.jpg"/>
+                        <div class="ib-list-item-preview">
+                            <div class="ib-list-item-preview-name">Hieu Le</div>
+                            <div class="ib-item-preview-snippet">Xin chao ban</div>
+                        </div>
+                        <div class="ib-list-item-ta">
+                            <input type="hidden" class="chatTimeAsNumber"/>
+                            <div class="ib-list-item-ta-time">2017-02-17 18:50</div>
+                            <div class="ib-list-item-ta-action"></div>
+                        </div>
+                    </div>
+                </div><div class="ib-list-item">
+                <div class="ib-list-item-labels"><span>VIP</span></div>
+                <div class="ib-list-item-content">
+                    <div class="ib-list-item-chk"><input type="checkbox"/></div>
+                    <img class="ib-list-item-avatar" src="images/a.jpg"/>
+                    <div class="ib-list-item-preview">
+                        <div class="ib-list-item-preview-name">Hieu Le</div>
+                        <div class="ib-item-preview-snippet">Xin chao ban</div>
+                    </div>
+                    <div class="ib-list-item-ta">
+                        <input type="hidden" class="chatTimeAsNumber"/>
+                        <div class="ib-list-item-ta-time">2017-02-17 18:50</div>
+                        <div class="ib-list-item-ta-action"></div>
+                    </div>
+                </div>
+            </div>
+                <div class="ib-list-item">
+                <div class="ib-list-item-labels"><span>VIP</span></div>
+                <div class="ib-list-item-content">
+                    <div class="ib-list-item-chk"><input type="checkbox"/></div>
+                    <img class="ib-list-item-avatar" src="images/a.jpg"/>
+                    <div class="ib-list-item-preview">
+                        <div class="ib-list-item-preview-name">Hieu Le</div>
+                        <div class="ib-item-preview-snippet">Xin chao ban</div>
+                    </div>
+                    <div class="ib-list-item-ta">
+                        <input type="hidden" class="chatTimeAsNumber"/>
+                        <div class="ib-list-item-ta-time">2017-02-17 18:50</div>
+                        <div class="ib-list-item-ta-action"></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="ib-reply-ctrl">
+                <input id="btnIbCancel" type="button" value="Cancel"/>
+                <input id="btnIbSend" type="button" value="Send"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

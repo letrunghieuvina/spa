@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SPA Starter</title>
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="modules/spa/shell.css">
+    <link rel="stylesheet" href="modules/pages/pages.css">
+    <link rel="stylesheet" href="modules/inbox/inbox.css">
+
+    <!-- third party javascript -->
+    <script src="js/jquery-3.1.1.min.js"></script>
+
+    <!-- our javascript -->
+    <script src="modules/spa/spa.js"></script>
+    <script src="modules/spa/util.js"></script>
+    <script src="modules/spa/shell.js"></script>
+    <script src="modules/spa/Event.js"></script>
+
+    <script src="modules/pages/PagesModel.js"></script>
+    <script src="modules/pages/PagesView.js"></script>
+    <script src="modules/pages/PagesController.js"></script>
+
+    <script src="modules/inbox/InboxChatListModel.js"></script>
+    <script src="modules/inbox/InboxChatListView.js"></script>
+    <script src="modules/inbox/InboxChatListController.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            spa.initModule(jQuery('#spa'));
+        });
+    </script>
+</head>
+<body>
+    <div id="popup-bg" class="hidden"></div>
+    <div id="spa">
+    </div>
+</body>
+</html>

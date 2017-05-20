@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="modules/spa/shell.css">
+    <link rel="stylesheet" href="modules/pages/pages.css">
+
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="modules/pages/PagesController.js"></script>
+    <script type="text/javascript">
+
+        var linkHandler = function(data) {
+            $(".ajaxContent").html(data);
+        }
+        var i = 0;
+
+        var linkClickHandler = function (event) {
+            createRequest("http://192.168.1.100:8080/web/inboxServlet");
+            addParam("pageId", "1405924026328697");
+            addParam("fromChatTimeStamp", "0")
+            sendRequest('get', linkHandler);
+        };
+
+        var responseHandler = function(data) {
+            i++;
+            if (i % 2 == 1) {
+                $(".ajaxContent").html(data);
+                return;
+            }
+            var $pagesContainer = $(".qspa-content-pages");
+            var $parent = $(".qspa-content");
+            var $pagesContainerClone = $pagesContainer.clone();
+            var $pageThumbnail = $pagesContainerClone.find(".qspa-content-pages-link");
+            var $pageThumbnailContainer = $pagesContainerClone.find(".qspa-content-pages-thumbnails");
+
+            var json = JSON.parse(data);
+            console.log(json.length);
+            for (var i = 0; i < json.length; ++i) {
+                var currentJson = json[i];
+                var $c = $pageThumbnail.clone();
+                $c.toggleClass("qspa-hidden");
+
+                var $img = $c.find(".qspa-content-pages-thumbnail-image");
+                $img.attr("src", currentJson["picture"]);
+
+                var $title = $c.find(".qspa-content-pages-thumbnail-title");
+                $title.html(currentJson["name"]);
+
+                $c.attr("href", "");//inbox.html?page_id=" + currentJson["id"]);
+                $c.on("click", linkClickHandler);
+
+                $pageThumbnailContainer.append($c);
+            }
+
+            $parent.append($pagesContainerClone);
+        }
+
+        var xmlhttp;
+        var response = null;
+        var variables = "";
+        var page;
+        var useAmp = false;
+        function createRequest(url) {
+            xmlhttp=new XMLHttpRequest();
+            page = url;
+        }
+
+        function addParam(name,value) {
+            if(useAmp == true)
+                variables += "&";
+            variables += name + "=" + value;
+            useAmp = true;
+        }
+
+        function sendRequest(type, handler) {
+            //the instructions param takes the form of an eval statement
+            if(type === "get") {
+                page += "?" + variables
+                xmlhttp.open("GET", page, true);
+                xmlhttp.onreadystatechange=function() {
+                    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                        response=xmlhttp.responseText;
+                        //eval(instructions)
+                        handler(response);
+                    }
+                }
+                xmlhttp.send();
+
+            }
+            else {
+                xmlhttp.open("POST", page, true);
+                //Send the proper header information along with the request
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xmlhttp.setRequestHeader("Content-length", variables.length);
+                xmlhttp.setRequestHeader("Connection", "close");
+                xmlhttp.onreadystatechange=function() {
+                    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                        response=xmlhttp.responseText;
+                        //eval(instructions)
+                    }
+                }
+                xmlhttp.send(variables);
+            }
+        }
+
+        $(function() {
+            createRequest("http://192.168.1.100:8080/web/pagesServlet");
+            addParam("page_id", "1405924026328697");
+            sendRequest('get', responseHandler);
+        });
+
+        //$(function() {
+
+
+            //$.get("pagesServlet", function(data) {
+            /*var responseHandler = function(data) {
+                var $pagesContainer = $(".qspa-content-pages");
+                var $parent = $(".qspa-content");
+                var $pagesContainerClone = $pagesContainer.clone();
+                var $pageThumbnail = $pagesContainerClone.find(".qspa-content-pages-link");
+                var $pageThumbnailContainer = $pagesContainerClone.find(".qspa-content-pages-thumbnails");
+
+                var json = JSON.parse(data);
+                console.log(json.length);
+                for (var i = 0; i < json.length; ++i) {
+                    var currentJson = json[i];
+                    var $c = $pageThumbnail.clone();
+                    $c.toggleClass("qspa-hidden");
+
+                    var $img = $c.find(".qspa-content-pages-thumbnail-image");
+                    $img.attr("src", currentJson["picture"]);
+
+                    var $title = $c.find(".qspa-content-pages-thumbnail-title");
+                    $title.html(currentJson["name"]);
+
+                    $c.attr("href", "inbox.html?page_id=" + currentJson["id"]);
+                    $c.on("click", linkClickHandler);
+
+                    $pageThumbnailContainer.append($c);
+                }
+
+                $parent.append($pagesContainerClone);
+            }*/
+            //});
+       // });
+    </script>
+
+    <title>Title</title>
+</head>
+<body>
+<div class="qspa-container">
+    <div class="qspa-header">
+        <div class="qspa-header-pagename">Your Pages</div>
+        <div class="qspa-header-action">
+            <a class="qspa-header-action-link">Logout</a>
+        </div>
+    </div>
+    <div class="qspa-content">
+
+    </div>
+    <div class="ajaxContent">
+
+    </div>
+
+    <div class="qspa-hidden">
+        <div class="qspa-content-pages">
+            <div class="qspa-content-pages-options">
+                <span>Options: </span>
+                <input type="checkbox" class="qspa-content-pages-options-chkallpage" value="showallpage"/> Show all pages
+            </div>
+            <div class="qspa-content-pages-thumbnails">
+                <a class="qspa-content-pages-link qspa-hidden" href="">
+                    <div class="qspa-content-pages-thumbnail">
+                        <div class="qspa-content-pages-thumbnail-title">Nuoc Hoa Bon Mua Nuoc Hoa Bon Mua</div>
+                        <div class="qspa-content-pages-thumbnail-img">
+                            <div class="qspa-content-pages-thumbnail-img-badge">
+                                <img class="imgTick" src="images/tick-on.jpg"/>
+                            </div>
+                            <img class="qspa-content-pages-thumbnail-image" src="images/nhbm.jpg"/>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

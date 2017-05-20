@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="modules/spa/shell.css">
+
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+
+        var spa = (function() {
+            var getParamMapFromUrl;
+            var loadChats;
+            var displayChatList;
+            var formatDate;
+            var state = {};
+            var date = new Date();
+
+            getParamMapFromUrl = function(url) {
+                var search = url.search;
+                var kvPairs;
+                var kvPairIndex;
+                var kv;
+                var k;
+                var v;
+                var returnObject = {};
+
+                if (search && search.length > 0) {
+                    search = search.substring(1);
+                    kvPairs = search.split('&');
+                    if (kvPairs.length > 0) {
+                        for (kvPairIndex in kvPairs) {
+                            kv = kvPairs[kvPairIndex].split('=');
+                            k = kv[0];
+                            v = kv[1];
+                            returnObject[k] = v;
+                        }
+                    }
+                }
+
+                return returnObject;
+            };
+
+            loadChats = function(pageId, fromChatTimeStamp, loadSize) {
+                $.get("inboxServlet", {pageId: pageId, fromChatTimeStamp: fromChatTimeStamp, loadSize: loadSize}, function(data) {
+                    //TODO: check data status and then display chat list
+                    /*
+                    chat data structure example:
+                     {
+                         "link": "/NuocHoaBonMua/manager/messages/?threadid=1316883845051281&folder=inbox",
+                         "id": "t_mid.1482907756817:51eb76d113",
+                         "updated_time": "{time in milliseconds}",
+                         "snippet": "V\u00e2ng",
+                         "participants": [
+                             {
+                                 "name": "Momo Mai",
+                                 "id": "1319387298134269",
+                                 "picture": "{link to picture}"
+                             },
+                             {
+                                 "name": "N\u01b0\u1edbc Hoa B\u1ed1n M\u00f9a",
+                                 "id": "1405924026328697",
+                                 "picture": "{link to picture}"
+                             }
+                         ]
+                     }
+                    */
+                    var d = JSON.parse(data);
+                    displayChatList(d);
+                });
+            };
+
+            // chatList: a list of JSON objects as chat list
+            displayChatList = function(chatList, currentPageId) {
+                var $chatItem = $(".templates .-item");
+                var $chatItemList = $(".qspa-content-chat-list .qspa-content-chat-list-items");
+
+                for (var i = 0; i < chatList.length; ++i) {
+                    var $chatItemClone = $chatItem.clone();
+
+                    var chat = chatList[i];
+
+                    var $img = $chatItemClone.find(".qspa-content-chat-list-item-avatar");
+                    $img.attr("src", chat["participants"][0]["picture"]);
+
+                    var $chatter = $chatItemClone.find(".qspa-content-chat-list-item-preview-name");
+                    $chatter.html(chat["participants"][0]["name"]);
+
+                    var $snippet = $chatItemClone.find(".qspa-content-chat-list-item-preview-snippet");
+                    $snippet.html(chat["snippet"]);
+
+                    var $time = $chatItemClone.find(".qspa-content-chat-list-ta-time");
+                    $time.html(formatDate(chat["updatedTime"]));
+                    $chatItemClone.find(".chatTimeAsNumber").val(chat["updatedTime"]);
+
+                    $chatItemList.append($chatItemClone);
+                }
+            }
+
+            formatDate = function(timeInMilliseconds) {
+                date.setTime(timeInMilliseconds);
+                var formattedToday = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + ' ' + date.getDate() + '/' + (date.getMonth() + 1) + '/' + (date.getYear() + 1900);
+                return formattedToday;
+            }
+
+            return {
+                getParamMapFromUrl: getParamMapFromUrl,
+                loadChats: loadChats,
+                formatDate: formatDate
+            }
+        }());
+
+        $(function () {
+            console.log("Inbox loaded time = " + Date.now());
+
+            var paramMap = spa.getParamMapFromUrl(window.location);
+            var pageId = paramMap["page_id"];
+
+            spa.loadChats(pageId, 0);
+
+            $(".qspa-content-chat-list-items-loadprev").on("click", function(event) {
+                var $firstChatItem = $(".qspa-content-chat-list .qspa-content-chat-list-items .qspa-content-chat-list-item:first-child");
+                spa.loadChats(pageId, $firstChatItem.find(".chatTimeAsNumber").val());
+            });
+
+            $(".qspa-content-chat-list-items-loadnext").on("click", function(event) {
+                var $firstChatItem = $(".qspa-content-chat-list .qspa-content-chat-list-items .qspa-content-chat-list-item:last-child");
+                spa.loadChats(pageId, $firstChatItem.find(".chatTimeAsNumber").val());
+            });
+        });
+    </script>
+
+    <style type="text/css">
+        .templates {
+            display: none;
+        }
+
+        .qspa-content {
+            height: 100%;
+            display: flex;
+        }
+
+        .qspa-content-chat-list {
+            height: 99%;
+            overflow-y: auto;
+            margin: 5px;
+            flex-grow: 1;
+        }
+
+        .qspa-content-chat-list-search {
+            height: 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .qspa-content-chat-list-search input {
+            margin: 0px 5px;
+        }
+        .qspa-content-chat-list-search>div:last-child {
+            margin: 0px 5px;
+            background-color: #f9f9f9;
+            padding: 2px;
+            border: thin solid #d9d9d9;
+            color: #c3c3c3;
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .qspa-content-chat-list-items-frame {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .qspa-content-chat-list-items-loadprev, .qspa-content-chat-list-items-loadnext {
+            min-height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 5px;
+        }
+        .qspa-content-chat-list-items-loadprev span, .qspa-content-chat-list-items-loadnext span {
+            padding: 5px 30px;
+            background-color: #d9d9d9;
+            border-radius: 2px;
+        }
+
+        .qspa-content-chat-list-items {
+
+        }
+
+        .qspa-content-chat-list-item {
+            background-color: #f9f9f9;
+            border-bottom: 1px solid white;
+            padding: 5px;
+        }
+
+        .qspa-content-chat-list-item-labels {
+            display: none;
+        }
+
+        .qspa-content-chat-list-item-labels span {
+            padding: 1px 10px;
+            border: thin solid #d9d9d9;
+        }
+
+        .qspa-content-labels-labellist-label {
+            margin-right: 5px;
+        }
+
+        .qspa-content-chat-list-item-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            min-height: 50px;
+        }
+
+        .qspa-content-chat-list-item-chk {
+            line-height: 32px;
+        }
+
+        .qspa-content-chat-list-item-avatar {
+            background-image: url("images/a.jpg");
+            width: 32px;
+            height: 32px;
+            display: inline;
+        }
+
+        .qspa-content-chat-list-item-preview {
+            display: flex;
+            flex-direction: column;
+            padding-left: 5px;
+            flex-basis: auto;
+            flex-grow: 1;
+        }
+
+        .qspa-content-chat-list-item-preview-name {
+
+        }
+
+        .qspa-content-chat-list-item-preview-snippet {
+        }
+
+        .qspa-content-chat-list-item-ta {
+
+        }
+
+        .qspa-content-chat-list-ta-time {
+            text-align: right;
+            flex-grow: 1;
+        }
+
+        .qspa-content-chat-list-item-ta-lastaction {
+
+        }
+
+        .qspa-content-chatframe {
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 3;
+        }
+
+        .qspa-content-chatframe-chatbox {
+            min-height: 100px;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .qspa-content-chatframe-chatbox-desc {
+            height: 30px;
+            padding-top: 5px;
+            padding-left: 5px;
+        }
+
+        .qspa-content-chatframe-chatbox-controls {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .qspa-content-chatframe-chatbox textarea {
+            flex-grow: 1;
+        }
+
+        .qspa-content-labellist {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .qspa-content-labellist-label {
+              padding: 1px;
+              border: thin solid #d9d9d9;
+        }
+
+        .qspa-content-labellist-label span:last-child {
+            color: red;
+            cursor: pointer;
+            padding: 0px 4px;
+        }
+        .qspa-content-labellist-label span:first-child {
+            margin-right: 10px;
+            padding-left: 10px;
+            cursor: pointer;
+        }
+
+        .qspa-content-labellist-controls {
+            margin-top: 20px;
+        }
+
+        .qspa-content-chatframe-preview {
+            flex-grow: 1;
+            margin: 10px 0px 10px 0px;
+            overflow-y: scroll;
+        }
+
+        .qspa-content-chatframe-preview-title {
+
+        }
+    </style>
+
+    <title>Title</title>
+</head>
+<body>
+<div class="qspa-container">
+    <div class="qspa-header">
+        <div class="qspa-header-pagename"><span>Page</span> <span>Inbox</span></div>
+        <div class="qspa-header-action">
+            <a class="qspa-header-action-link">Logout</a>
+        </div>
+    </div>
+    <div class="qspa-content">
+        <div class="qspa-content-chat-list">
+            <div class="qspa-content-chat-list-search">
+                <input type="text" placeholder="search name"/>
+                <div id="searchDrop">Filter by labels, drag labels here</div>
+            </div>
+            <div class="qspa-content-chat-list-items-frame">
+                <div class="qspa-content-chat-list-items-loadprev">
+                    <span>Load More</span>
+                </div>
+                <div class="qspa-content-chat-list-items">
+                    <!-- chat item to be appended here -->
+                </div>
+                <div class="qspa-content-chat-list-items-loadnext">
+                    <span>Load More</span>
+                </div>
+            </div>
+        </div>
+        <div class="qspa-content-chatframe">
+            <div class="qspa-content-labelframe">
+                <span>Labels: </span>
+                <div class="qspa-content-labellist">
+                    <div class="qspa-content-labellist-label">
+                        <span>Label 1</span>
+                        <span>x</span>
+                    </div>
+                    <div class="qspa-content-labellist-label">
+                        <span>Label 2</span>
+                        <span>x</span>
+                    </div>
+                </div>
+                <div class="qspa-content-labellist-controls">
+                    <input type="hidden" value="label1"/>
+                    <span>Add new label: </span>
+                    <input type="text" placeholder="add new label"/>
+                    <input type="button" value="Add Label"/>
+                </div>
+            </div>
+            <div class="qspa-content-chatframe-preview">
+                <div class="qspa-content-chatframe-preview-title">Preview messages to be sent: </div>
+                <div class="qspa-content-chat-list-items">
+                </div>
+            </div>
+            <div class="qspa-content-chatframe-chatbox">
+                <div class="qspa-content-chatframe-chatbox-desc">This is a description</div>
+                <div class="qspa-content-chatframe-chatbox-controls">
+                    <textarea></textarea> <input type="button" value="Send"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="templates">
+    <div class="qspa-content-chat-list-item">
+        <div class="qspa-content-chat-list-item-labels">
+            <span>vip</span>
+        </div>
+        <div class="qspa-content-chat-list-item-content">
+            <div class="qspa-content-chat-list-item-chk">
+                <input type="checkbox"/>
+            </div>
+            <img class="qspa-content-chat-list-item-avatar" src="images/a.jpg"/>
+            <div class="qspa-content-chat-list-item-preview">
+                <div class="qspa-content-chat-list-item-preview-name">
+                    Nuoc Hoa Bon Mua
+                </div>
+                <div class="qspa-content-chat-list-item-preview-snippet">
+                    Mai ban cu ghe shop nhe.
+                </div>
+            </div>
+            <div class="qspa-content-chat-list-item-ta">
+                <input type="hidden" class="chatTimeAsNumber"/>
+                <div class="qspa-content-chat-list-ta-time">
+                    Oct 8
+                </div>
+                <div class="qspa-content-chat-list-item-ta-lastaction">
+                </div>
+            </div>
+        </div>
+    </div>/
+</div>
+
+</body>
+</html>

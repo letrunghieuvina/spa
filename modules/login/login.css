@@ -1,0 +1,37 @@
+* {
+    font-size: 10pt;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    padding: 0px;
+    margin: 0px;
+    height: 100%
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #cccccc;
+    justify-content: center;
+}
+.login {
+    padding: 5px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.intro-text {
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.loginbutton {
+    background-color: #444444;
+}
